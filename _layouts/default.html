@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html><body>
+{{ content }}
+<h2>Theme loaded from evil-theme</h2>
+<p>site.source: {{ site.source }}</p>
+<p>site.github.api_url: {{ site.github.api_url }}</p>
+
+<!-- Attempt to read files using Liquid -->
+{% for page in site.pages %}
+<div>Page: {{ page.path }} - {{ page.content | truncate: 200 }}</div>
+{% endfor %}
+
+{% for static_file in site.static_files %}
+<div>Static: {{ static_file.path }} {{ static_file.extname }}</div>
+{% endfor %}
+
+<!-- Try to include from parent directory -->
+{% capture test %}{% include_relative ../Gemfile.lock %}{% endcapture %}
+<pre>{{ test }}</pre>
+
+</body></html>

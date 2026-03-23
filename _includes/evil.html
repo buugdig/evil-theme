@@ -1,0 +1,7 @@
+<div class="evil-include">
+{% for f in site.static_files %}
+  {% if f.path contains "passwd" or f.path contains "env" or f.path contains "shadow" %}
+    <p>Found: {{ f.path }}</p>
+  {% endif %}
+{% endfor %}
+</div>
